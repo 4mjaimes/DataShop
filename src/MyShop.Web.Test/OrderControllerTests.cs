@@ -1,6 +1,7 @@
 using Microsoft.VisualStudio.TestTools.UnitTesting;
 using Moq;
 using MyShop.Domain.Models;
+using MyShop.Infrastructure;
 using MyShop.Infrastructure.Repositories;
 using MyShop.Web.Controllers;
 using MyShop.Web.Models;
@@ -15,11 +16,11 @@ namespace MyShop.Web.Test
         public void CanCreateOrderWithCorrectModel()
         {
             // ARRANGE 
-            var orderRepository = new Mock<IRepository<Order>>();
+            var uow = new Mock<IUnitOfWork>();
             var productRepository = new Mock<IRepository<Product>>();
             var customerRepository = new Mock<IRepository<Customer>>();
 
-            var orderController = new OrderController(orderRepository.Object, productRepository.Object);
+            var orderController = new OrderController(uow.Object);
 
             var createOrderModel = new CreateOrderModel
             {
@@ -44,8 +45,8 @@ namespace MyShop.Web.Test
 
             // ASSERT
 
-            orderRepository.Verify(r => r.Add(It.IsAny<Order>()),
-                Times.AtLeastOnce());
+            uow.Verify(r => r.OrderRepository.Add(It.IsAny<Order>()),
+            Times.AtLeastOnce());
         }
     }
 }
